@@ -10,7 +10,7 @@ spring:
 zkapachebridge:
   rewritemap:
     active: true
-    path: /etc/apache2/maps/rworig.map
+    path: /etc/apache2/maps/apimap.map
   loadbalancer:
     active: false
     path: /etc/apache2/maps/lbconfig.conf
