@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: zk-client-sample
+  cloud:
+    zookeeper:
+      discovery:
+        enabled: true
+      connect-string: localhost:2181
+
+---
+spring:
+  profiles: docker
+  cloud:
+    zookeeper:
+      connect-string: zookeeper:2181

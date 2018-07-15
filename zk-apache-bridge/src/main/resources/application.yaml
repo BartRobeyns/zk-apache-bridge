@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: zk-apache-bridge
+  cloud:
+    zookeeper:
+      discovery:
+        enabled: true
+      connect-string: localhost:2181
+      max-retries: 1
+zkapachebridge:
+  rewritemap:
+    active: true
+    path: /etc/apache2/maps/rworig.map
+  loadbalancer:
+    active: false
+    path: /etc/apache2/maps/lbconfig.conf
+    template: /loadbalancer-config.ftl
+    apache-reload: apachectl graceful
+
+
+
+---
+spring:
+  profiles: docker
+  cloud:
+    zookeeper:
+      connect-string: zookeeper:2181
