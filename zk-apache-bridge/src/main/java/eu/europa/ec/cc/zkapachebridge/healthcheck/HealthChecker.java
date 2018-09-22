@@ -40,7 +40,7 @@ public class HealthChecker {
         this.eventPublisher = eventPublisher;
     }
 
-    @Scheduled(fixedDelay = 20000)
+    @Scheduled(fixedDelayString = "${zkapachebridge.healthcheck.interval}")
     public void checkEndpointsHealth() {
         Map<String, EndpointCollection> services = serviceRegistry.getServices();
         services.forEach((servicename, endpoints) -> {

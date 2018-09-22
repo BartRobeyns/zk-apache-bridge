@@ -15,6 +15,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.zookeeper.serviceregistry.ServiceInstanceRegistration;
 import org.springframework.test.context.TestPropertySource;
@@ -48,6 +49,9 @@ public class ZookeeperListenerTest {
 
     @Autowired
     TestingServer testingServer;
+
+    @Value("${zkapachebridge.healthcheck.interval}")
+    private long healthcheckInterval;
 
     @PostConstruct
     public void init() throws Exception {
@@ -103,21 +107,23 @@ public class ZookeeperListenerTest {
         Assert.isTrue(!isActive, "not yet activated endpoint is active!");
 
         serviceHolder1.createServer(true);
-        waitForJettyServer();
+        waitForHealtcheck();
 
+        System.out.println(serviceHolder1.getName());
+        System.out.println(serviceHolder1.getUri());
         isActive = isEndpointActive(serviceHolder1.getName(), serviceHolder1.getUri());
         Assert.isTrue(isActive, "activated endpoint is not active!");
         Assert.isTrue(isEndpointInRewriteMap(serviceHolder1), "activated endpoint not in rewritemap");
 
         serviceHolder2.createServer(true);
-        waitForJettyServer();
+        waitForHealtcheck();
 
         isActive = isEndpointActive(serviceHolder2.getName(), serviceHolder2.getUri());
         Assert.isTrue(isActive, "activated endpoint is not active!");
         Assert.isTrue(isEndpointInRewriteMap(serviceHolder2), "activated endpoint not in rewritemap");
 
         serviceHolder1.stopServer();
-        Thread.sleep(1000);
+        waitForHealtcheck();
 
         isActive = isEndpointActive(serviceHolder1.getName(), serviceHolder1.getUri());
         Assert.isTrue(!isActive, "de-activated endpoint is still active!");
@@ -127,8 +133,8 @@ public class ZookeeperListenerTest {
 
     }
 
-    private void waitForJettyServer() throws InterruptedException {
-        Thread.sleep(1000);
+    private void waitForHealtcheck() throws InterruptedException {
+        Thread.sleep(healthcheckInterval * 2);
     }
 
     private void waitForZookeeperEvents() throws InterruptedException {
