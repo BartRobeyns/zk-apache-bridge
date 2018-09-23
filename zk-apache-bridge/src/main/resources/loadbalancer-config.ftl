@@ -2,8 +2,8 @@
 
 <#list services?keys as key>
     <Proxy "balancer://${key}">
-        <#list services[key].endpoints as endpoint>
-            BalancerMember "${endpoint.uri}"
+        <#list services[key].activeURIStrings as URI>
+            BalancerMember "${URI}"
         </#list>
     </Proxy>
     ProxyPass /${key} balancer://${key}
