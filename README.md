@@ -29,7 +29,7 @@ curl http://localhost/zk-sample-client/zkclient
 curl http://localhost:8080/zk-sample-client/zkclient
 ```
 
-## Run it with to an existing Apache
+## Run it with an existing Apache
 ```
 java -jar zk-apache-bridge-1.0.0-SNAPSHOT-exec.jar
 ```
@@ -37,12 +37,15 @@ parameters:
 
     --spring.cloud.zookeeper.connect-string=<zookeeper-url> (defaults to localhost:2181)
     --spring.cloud.zookeeper.discovery.register=<true|false> (default: true, makes zk-apache-bridge itself discoverable)
+    --zkapachebridge.healthcheck.interval=(default:20000, time in ms between healthchecks)
+    
     --zkapachebridge.rewritemap.active=<true|false> (default: true)
     --zkapachebridge.rewritemap.path=<path where to write the rewritemap> (default: /etc/apache2/maps/apimap.map)
     
     --zkapachebridge.loadbalancer.active=<true|false> (default: false)
-    --zkapachebridge.loadbalancer.path:<path where to write the LoadBalancer configuration> (default: /etc/apache2/maps/lbconfig.conf)
-    --zkapachebridge.loadbalancer.apache-reload:<command to restart apache after the LoadBalancer configuration has been updated) (default: apachectl graceful)
+    --zkapachebridge.loadbalancer.path=<path where to write the LoadBalancer configuration> (default: /etc/apache2/maps/lbconfig.conf)
+    --zkapachebridge.loadbalancer.apache-reload=<command to restart apache after the LoadBalancer configuration has been updated) (default: apachectl graceful)
+    --zkapachebridge.loadbalancer.template=(default: /loadbalancer-config.ftl, location of the freemarker-template to construct the loadbalancer configuration)
 
 ### RewriteRule-based loadbalancing
 [See the RewriteMap Docker-image](./zk-apache-bridge-docker/zk-apache-bridge-docker-rewritemap)
@@ -53,7 +56,6 @@ A value can be a list (delimited with |), from where an entry is picked at rando
 E.g. with map/apimap.txt
 ```
 service1 http://192.168.0.1:80|http://192.168.0.2:80
-
 ```
 you can get either the ...0.1 or the ....0.2 address in a RewriteRule like this:
 ```
