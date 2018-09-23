@@ -9,7 +9,7 @@ spring:
       connect-string: localhost:2181
       max-retries: 1
 zkapachebridge:
-  healtcheck:
+  healthcheck:
     interval: 20000
   rewritemap:
     active: true
