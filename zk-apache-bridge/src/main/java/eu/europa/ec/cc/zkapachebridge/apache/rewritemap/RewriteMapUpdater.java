@@ -40,6 +40,10 @@ public class RewriteMapUpdater implements ApplicationListener<ServiceRegistryUpd
         rewriteMapWriter.write(contents);
     }
 
+    public String getConfiguration() {
+        return buildRewriteMapContents();
+    }
+
     private String buildRewriteMapContents() {
         Map<String, EndpointCollection> services = serviceRegistry.getServices();
         StringBuffer sb = new StringBuffer();
@@ -49,4 +53,5 @@ public class RewriteMapUpdater implements ApplicationListener<ServiceRegistryUpd
                 .append("\n"));
         return sb.toString();
     }
+
 }

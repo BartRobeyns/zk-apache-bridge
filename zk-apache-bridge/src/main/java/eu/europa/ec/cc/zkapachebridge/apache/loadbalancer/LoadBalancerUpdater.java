@@ -61,6 +61,10 @@ public class LoadBalancerUpdater implements ApplicationListener<ServiceRegistryU
         }
     }
 
+    public String getConfiguration() throws Exception {
+        return buildLoadBalancerContents();
+    }
+
     String buildLoadBalancerContents() throws Exception {
         Map<String, Object> model = buildServicesFreemarkerModel();
         Template template = freemarkerConfiguration.getTemplate(loadBalancerConfigTemplate);

@@ -39,6 +39,7 @@ services:
       image: ecdevops.eu/zk-apache-bridge-docker-rewritemap
       ports:
         - 80:80
+        - 9090:8080
         - 5005:5005
       links:
         - zookeeper
@@ -50,6 +51,7 @@ services:
       image: ecdevops.eu/zk-apache-bridge-docker-loadbalancer
       ports:
         - 8080:80
+        - 9091:8080
         - 5006:5005
       links:
         - zookeeper
