@@ -5,6 +5,7 @@ spring:
     zookeeper:
       discovery:
         enabled: true
+        register: true
       connect-string: localhost:2181
       max-retries: 1
 zkapachebridge:

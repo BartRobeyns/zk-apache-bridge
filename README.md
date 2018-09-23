@@ -36,6 +36,7 @@ java -jar zk-apache-bridge-1.0.0-SNAPSHOT-exec.jar
 parameters:
 
     --spring.cloud.zookeeper.connect-string=<zookeeper-url> (defaults to localhost:2181)
+    --spring.cloud.zookeeper.discovery.register=<true|false> (default: true, makes zk-apache-bridge itself discoverable)
     --zkapachebridge.rewritemap.active=<true|false> (default: true)
     --zkapachebridge.rewritemap.path=<path where to write the rewritemap> (default: /etc/apache2/maps/apimap.map)
     
