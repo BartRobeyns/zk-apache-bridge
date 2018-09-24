@@ -6,5 +6,5 @@
             BalancerMember "${URI}"
         </#list>
     </Proxy>
-    ProxyPass /${key} balancer://${key}
+    ProxyPass /${prefix}${key} balancer://${key}
 </#list>

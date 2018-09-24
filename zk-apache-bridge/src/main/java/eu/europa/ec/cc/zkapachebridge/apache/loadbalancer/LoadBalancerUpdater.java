@@ -37,6 +37,8 @@ public class LoadBalancerUpdater implements ApplicationListener<ServiceRegistryU
     @Value("${zkapachebridge.loadbalancer.apache-reload}")
     String apacheReload;
 
+    @Value("${zkapachebridge.urls.prefix:}")
+    String urlPrefix;
 
     @Autowired
     public LoadBalancerUpdater(Configuration freemarkerConfiguration, LoadBalancerWriter loadBalancerWriter, ServiceRegistry serviceRegistry) {
@@ -80,6 +82,7 @@ public class LoadBalancerUpdater implements ApplicationListener<ServiceRegistryU
     private Map<String, Object> buildServicesFreemarkerModel() {
         Map<String, Object> model = new HashMap<>();
         model.put("services", serviceRegistry.getServices());
+        model.put("prefix", urlPrefix);
         return model;
     }
 

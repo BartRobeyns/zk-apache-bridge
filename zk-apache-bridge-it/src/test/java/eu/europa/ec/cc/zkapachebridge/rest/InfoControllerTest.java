@@ -42,13 +42,13 @@ public class InfoControllerTest {
     public void getLoadBalancerConfiguration() {
         assertThat(
                 this.restTemplate.getForObject("/api/info/loadbalancer", String.class),
-                new StringContains("ProxyPass /zk-apache-bridge"));
+                new StringContains("ProxyPass /services/zk-apache-bridge"));
     }
 
     @Test
     public void getRewriteMapConfiguration() {
         assertThat(
                 this.restTemplate.getForObject("/api/info/rewritemap", String.class),
-                new StringContains("zk-apache-bridge"));
+                new StringContains("services/zk-apache-bridge"));
     }
 }

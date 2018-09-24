@@ -11,6 +11,8 @@ spring:
 zkapachebridge:
   healthcheck:
     interval: 20000
+  urls:
+    prefix: services/
   rewritemap:
     active: true
     path: /etc/apache2/maps/apimap.map

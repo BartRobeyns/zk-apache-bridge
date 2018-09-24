@@ -23,6 +23,9 @@ public class RewriteMapUpdater implements ApplicationListener<ServiceRegistryUpd
     @Value("${zkapachebridge.rewritemap.active}")
     boolean active;
 
+    @Value("${zkapachebridge.urls.prefix:}")
+    String urlPrefix;
+
     @Autowired
     public RewriteMapUpdater(Configuration freemarkerConfiguration, RewriteMapWriter rewriteMapWriter, ServiceRegistry serviceRegistry) {
         this.freemarkerConfiguration = freemarkerConfiguration;
@@ -47,7 +50,10 @@ public class RewriteMapUpdater implements ApplicationListener<ServiceRegistryUpd
     private String buildRewriteMapContents() {
         Map<String, EndpointCollection> services = serviceRegistry.getServices();
         StringBuffer sb = new StringBuffer();
-        services.forEach((servicename, endpointCollection) -> sb.append(servicename)
+        services.forEach((servicename, endpointCollection) ->
+            sb
+                .append(urlPrefix)
+                .append(servicename)
                 .append("\t")
                 .append(String.join("|", endpointCollection.getActiveURIStrings()))
                 .append("\n"));

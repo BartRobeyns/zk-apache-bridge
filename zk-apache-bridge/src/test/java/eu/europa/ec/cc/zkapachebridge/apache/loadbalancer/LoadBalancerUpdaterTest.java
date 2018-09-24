@@ -33,6 +33,7 @@ public class LoadBalancerUpdaterTest {
         LoadBalancerUpdater loadBalancerUpdater = new LoadBalancerUpdater( freemarkerConfiguration,
                 rewriteMapWriter, serviceRegistry );
         loadBalancerUpdater.loadBalancerConfigTemplate = "loadbalancer-config.ftl";
+        loadBalancerUpdater.urlPrefix="services/";
         String content = loadBalancerUpdater.buildLoadBalancerContents();
 
         final Pattern balancerOne = Pattern.compile("\\Q<Proxy \"balancer://one\">\\E(.*?)</Proxy>", Pattern.DOTALL);
