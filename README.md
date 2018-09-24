@@ -47,6 +47,16 @@ parameters:
     --zkapachebridge.loadbalancer.apache-reload=<command to restart apache after the LoadBalancer configuration has been updated) (default: apachectl graceful)
     --zkapachebridge.loadbalancer.template=(default: /loadbalancer-config.ftl, location of the freemarker-template to construct the loadbalancer configuration)
 
+## Monitor it
+```
+# list services, endpoints and active-status
+GET http://<host>:<port>/api/info
+# show the resultant loadbalancer configuration
+GET http://<host>:<port>/api/info/loadbalancer
+# show the resultant rewritemap
+GET http://<host>:<port>/api/info/rewritemap
+```
+
 ### RewriteRule-based loadbalancing
 [See the RewriteMap Docker-image](./zk-apache-bridge-docker/zk-apache-bridge-docker-rewritemap)
 
