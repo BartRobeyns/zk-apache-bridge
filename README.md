@@ -49,6 +49,7 @@ parameters:
 
 ## Monitor it
 ```
+# default port is 8080
 # list services, endpoints and active-status
 GET http://<host>:<port>/api/info
 # show the resultant loadbalancer configuration
