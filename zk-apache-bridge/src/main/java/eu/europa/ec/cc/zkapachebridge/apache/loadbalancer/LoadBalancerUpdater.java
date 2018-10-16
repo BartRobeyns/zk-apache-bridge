@@ -1,5 +1,6 @@
 package eu.europa.ec.cc.zkapachebridge.apache.loadbalancer;
 
+import eu.europa.ec.cc.zkapachebridge.serviceregistry.EndpointCollection;
 import eu.europa.ec.cc.zkapachebridge.serviceregistry.ServiceRegistry;
 import eu.europa.ec.cc.zkapachebridge.serviceregistry.ServiceRegistryUpdatedEvent;
 import freemarker.template.Configuration;
@@ -80,10 +81,24 @@ public class LoadBalancerUpdater implements ApplicationListener<ServiceRegistryU
     }
 
     private Map<String, Object> buildServicesFreemarkerModel() {
+        Map<String, EndpointCollection> sanitizedServices = sanitizeServiceNames(serviceRegistry.getServices());
         Map<String, Object> model = new HashMap<>();
-        model.put("services", serviceRegistry.getServices());
+        model.put("services", sanitizedServices);
         model.put("prefix", urlPrefix);
         return model;
+    }
+
+    private Map<String, EndpointCollection> sanitizeServiceNames(Map<String,EndpointCollection> services) {
+        Map<String, EndpointCollection> result = new HashMap<>();
+        for (Map.Entry<String,EndpointCollection> serviceEntry: services.entrySet() ) {
+            String key = sanitizeServiceName(serviceEntry.getKey());
+            result.put(key, serviceEntry.getValue());
+        }
+        return result;
+    }
+
+    public String sanitizeServiceName(String key) {
+        return key.replaceAll("([^-_A-Za-z0-9])", "-" );
     }
 
     void reloadApache() throws IOException {

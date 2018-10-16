@@ -22,18 +22,7 @@ public class LoadBalancerUpdaterTest {
     @Test
     public void buildLoadBalancerContentsTest() throws Exception {
 
-        ServiceRegistry serviceRegistry = new ServiceRegistryImpl(publisher);
-        LoadBalancerWriter rewriteMapWriter = null;
-        Configuration freemarkerConfiguration = new Configuration( Configuration.VERSION_2_3_28 );
-        freemarkerConfiguration.setClassLoaderForTemplateLoading(LoadBalancerUpdater.class.getClassLoader(), "/");
-        freemarkerConfiguration.setWhitespaceStripping(true);
-
-        setupServices(serviceRegistry);
-
-        LoadBalancerUpdater loadBalancerUpdater = new LoadBalancerUpdater( freemarkerConfiguration,
-                rewriteMapWriter, serviceRegistry );
-        loadBalancerUpdater.loadBalancerConfigTemplate = "loadbalancer-config.ftl";
-        loadBalancerUpdater.urlPrefix="services/";
+        LoadBalancerUpdater loadBalancerUpdater = buildLoadBalancerUpdater();
         String content = loadBalancerUpdater.buildLoadBalancerContents();
 
         final Pattern balancerOne = Pattern.compile("\\Q<Proxy \"balancer://one\">\\E(.*?)</Proxy>", Pattern.DOTALL);
@@ -55,6 +44,43 @@ public class LoadBalancerUpdaterTest {
         Assert.isTrue(balancerTwoMemberOne.matcher(members).find(), "Member two:1 not found");
         Assert.isTrue(balancerTwoMemberTwo.matcher(members).find(), "Member two:2 not found");
 
+    }
+
+    private LoadBalancerUpdater buildLoadBalancerUpdater() {
+        ServiceRegistry serviceRegistry = new ServiceRegistryImpl(publisher);
+        LoadBalancerWriter rewriteMapWriter = null;
+        Configuration freemarkerConfiguration = new Configuration( Configuration.VERSION_2_3_28 );
+        freemarkerConfiguration.setClassLoaderForTemplateLoading(LoadBalancerUpdater.class.getClassLoader(), "/");
+        freemarkerConfiguration.setWhitespaceStripping(true);
+
+        setupServices(serviceRegistry);
+
+        LoadBalancerUpdater loadBalancerUpdater = new LoadBalancerUpdater( freemarkerConfiguration,
+                rewriteMapWriter, serviceRegistry );
+        loadBalancerUpdater.loadBalancerConfigTemplate = "loadbalancer-config.ftl";
+        loadBalancerUpdater.urlPrefix="services/";
+        return loadBalancerUpdater;
+    }
+
+
+    @Test
+    public void testServiceNameSanitize() {
+
+        LoadBalancerUpdater loadBalancerUpdater = buildLoadBalancerUpdater();
+        String r = loadBalancerUpdater.sanitizeServiceName("abc");
+        Assert.isTrue("abc".equals(r));
+
+        r = loadBalancerUpdater.sanitizeServiceName("ab c");
+        System.out.println(r);
+        Assert.isTrue("ab-c".equals(r));
+
+        r = loadBalancerUpdater.sanitizeServiceName("ab  c");
+        System.out.println(r);
+        Assert.isTrue("ab--c".equals(r));
+
+        r = loadBalancerUpdater.sanitizeServiceName("ab  c$%#");
+        System.out.println(r);
+        Assert.isTrue("ab--c---".equals(r));
     }
 
     private void setupServices(ServiceRegistry serviceRegistry) {

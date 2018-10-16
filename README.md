@@ -7,6 +7,9 @@ Provides the endpoints, registered in Zookeeper, to Apache. Either as a rewritem
 
 The discovered endpoints are health-checked based on Spring-Boot's /actuator/health endpoint
 
+The service-names, as they are registered in Zookeeper, are mapped to the /services/<service-name> on the Apache-root.
+Only characters [-_a-zA-Z0-9] are allowed in these service-names; all others are replaced with '-'.
+
 ## Build it
 ``` 
 git clone https://github.com/BartRobeyns/zk-apache-bridge.git
@@ -26,7 +29,7 @@ docker-compose up -d --scale zkclientsample=3
 curl http://localhost/zk-sample-client/zkclient
 
 # The RewriteRule-based loadbalancing listens on port 80, to see the LoadBalancer-configuration in action use port 8080 instead:
-curl http://localhost:8080/zk-sample-client/zkclient
+curl http://localhost:8080/services/zk-sample-client/zkclient
 ```
 
 ## Run it with an existing Apache
