@@ -49,9 +49,9 @@ public class HealthChecker {
                 URI uri = endpoint.getUri();
                 String healthURL = uri.toString() + "/actuator/health";
                 RequestConfig requestConfig = RequestConfig.custom()
-                        .setSocketTimeout(1000)
-                        .setConnectTimeout(200)
-                        .setConnectionRequestTimeout(1000).build();
+                        .setSocketTimeout(2000)
+                        .setConnectTimeout(2000)
+                        .setConnectionRequestTimeout(2000).build();
                 try (CloseableHttpClient client
                         = HttpClients.custom().setConnectionManager(poolingConnManager)
                         .setConnectionManagerShared(true)
