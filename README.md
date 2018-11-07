@@ -40,7 +40,13 @@ parameters:
 
     --spring.cloud.zookeeper.connect-string=<zookeeper-url> (defaults to localhost:2181)
     --spring.cloud.zookeeper.discovery.register=<true|false> (default: true, makes zk-apache-bridge itself discoverable)
+    
     --zkapachebridge.healthcheck.interval=(default:20000, time in ms between healthchecks)
+    --zkapachebridge.healthcheck.timeout.connect=(default:5000)
+    --zkapachebridge.healthcheck.timeout.socket=(default:5000)
+    --zkapachebridge.healthcheck.timeout.connectionRequest=(default:5000)
+    --zkapachebridge.healthcheck.enabled=(default:true)
+    
     --zkapachebridge.urls.prefix=<prefix for the exposed endpoints> (defaults to 'services/')
     
     --zkapachebridge.rewritemap.active=<true|false> (default: true)

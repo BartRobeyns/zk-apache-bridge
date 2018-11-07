@@ -10,7 +10,13 @@ spring:
       max-retries: 1
 zkapachebridge:
   healthcheck:
+    enabled: true
     interval: 20000
+    timeout:
+      socket: 2000
+      connect: 2000
+      connectionRequest: 2000
+
   urls:
     prefix: services/
   rewritemap:

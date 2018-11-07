@@ -16,6 +16,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -34,6 +35,18 @@ public class HealthChecker {
 
     private final ApplicationEventPublisher eventPublisher;
 
+    @Value("${zkapachebridge.healthcheck.timeout.socket}")
+    private int socketTimeout;
+
+    @Value("${zkapachebridge.healthcheck.timeout.connect}")
+    private int connectTimeout;
+
+    @Value("${zkapachebridge.healthcheck.timeout.connectionRequest}")
+    private int connectionRequestTimeout;
+
+    @Value("${zkapachebridge.healthcheck.enabled}")
+    private boolean enabled;
+
     @Autowired
     public HealthChecker(ServiceRegistry serviceRegistry, ApplicationEventPublisher eventPublisher) {
         this.serviceRegistry = serviceRegistry;
@@ -42,6 +55,9 @@ public class HealthChecker {
 
     @Scheduled(fixedDelayString = "${zkapachebridge.healthcheck.interval}")
     public void checkEndpointsHealth() {
+        if ( !enabled ) {
+            return;
+        }
         Map<String, EndpointCollection> services = serviceRegistry.getServices();
         services.forEach((servicename, endpoints) -> {
             List<Endpoint> list = endpoints.getEndpoints();
@@ -49,9 +65,9 @@ public class HealthChecker {
                 URI uri = endpoint.getUri();
                 String healthURL = uri.toString() + "/actuator/health";
                 RequestConfig requestConfig = RequestConfig.custom()
-                        .setSocketTimeout(2000)
-                        .setConnectTimeout(2000)
-                        .setConnectionRequestTimeout(2000).build();
+                        .setSocketTimeout(socketTimeout)
+                        .setConnectTimeout(connectTimeout)
+                        .setConnectionRequestTimeout(connectionRequestTimeout).build();
                 try (CloseableHttpClient client
                         = HttpClients.custom().setConnectionManager(poolingConnManager)
                         .setConnectionManagerShared(true)
