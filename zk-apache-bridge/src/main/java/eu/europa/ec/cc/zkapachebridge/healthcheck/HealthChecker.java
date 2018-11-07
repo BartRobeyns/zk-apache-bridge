@@ -15,6 +15,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.GsonJsonParser;
@@ -29,6 +31,8 @@ import java.util.Map;
 
 @Component
 public class HealthChecker {
+    private static final Logger LOG = LoggerFactory.getLogger(HealthChecker.class);
+
     private final ServiceRegistry serviceRegistry;
 
     private final HttpClientConnectionManager poolingConnManager = new PoolingHttpClientConnectionManager();
@@ -55,9 +59,6 @@ public class HealthChecker {
 
     @Scheduled(fixedDelayString = "${zkapachebridge.healthcheck.interval}")
     public void checkEndpointsHealth() {
-        if ( !enabled ) {
-            return;
-        }
         Map<String, EndpointCollection> services = serviceRegistry.getServices();
         services.forEach((servicename, endpoints) -> {
             List<Endpoint> list = endpoints.getEndpoints();
@@ -85,24 +86,22 @@ public class HealthChecker {
                                     isActive = true;
                                 }
                             } catch( Exception e ) {
-                                System.out.println("Failed to parse content " + content);
+                                LOG.error("Failed to parse content " + content);
                             }
                         }
                     } catch (HttpHostConnectException e) {
                         // host not available, mark as inactive
                     } catch (IOException e) {
-                        System.out.println("Failed to contact " + healthURL);
-                        e.printStackTrace();
+                        LOG.error("Failed to contact " + healthURL, e);
                     }
 
                     if (endpoint.isActive() != isActive) {
-                        endpoint.setActive(isActive);
-                        System.out.println("endpont changed: " + endpoint);
+                        endpoint.setActive(enabled?true:isActive);
+                        LOG.info("endpoint changed: " + endpoint);
                         eventPublisher.publishEvent(new ServiceRegistryUpdatedEvent(this));
                     }
                 } catch (IOException e) {
-                    System.out.println("Failed to contact " + healthURL);
-                    e.printStackTrace();
+                    LOG.error("Failed to contact " + healthURL, e);
                 }
 
             });
