@@ -96,7 +96,7 @@ public class HealthChecker {
                     }
 
                     if (endpoint.isActive() != isActive) {
-                        endpoint.setActive(enabled?true:isActive);
+                        endpoint.setActive(enabled?isActive:true);
                         LOG.info("endpoint changed: " + endpoint);
                         eventPublisher.publishEvent(new ServiceRegistryUpdatedEvent(this));
                     }
