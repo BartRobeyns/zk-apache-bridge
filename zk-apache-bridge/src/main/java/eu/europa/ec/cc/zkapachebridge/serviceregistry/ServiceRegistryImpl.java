@@ -24,20 +24,19 @@ public class ServiceRegistryImpl implements ServiceRegistry {
     }
 
     @Override
-    public void addServiceURI(String service, URI uri, boolean healthCheckEnabled, String healthCheckEndpoint) {
+    public void addServiceURI(String service, String instance, URI uri, boolean healthCheckEnabled, String healthCheckEndpoint) {
         EndpointCollection endpoints = ensureEndpointListExists(service);
-        if (!endpoints.containsURI(uri)) {
-            endpoints.addURI(uri, healthCheckEnabled, healthCheckEndpoint);
+        if (!endpoints.containsInstance(instance)) {
+            endpoints.addURI(uri, instance, healthCheckEnabled, healthCheckEndpoint);
             eventPublisher.publishEvent(new ServiceRegistryUpdatedEvent(this));
         }
     }
 
 
     @Override
-    public void removeServiceURI(String service, URI uri) {
+    public void removeServiceURI(String service, String instance) {
         EndpointCollection endpoints = ensureEndpointListExists(service);
-        Endpoint byURI = endpoints.findByURI(uri);
-        endpoints.removeURI(uri);
+        endpoints.removeInstance(instance);
         eventPublisher.publishEvent(new ServiceRegistryUpdatedEvent(this));
     }
 

@@ -12,8 +12,8 @@ public class EndpointCollection {
 
     private List<Endpoint> endpoints = new ArrayList<>();
 
-    public void addURI(URI uri, boolean healthCheckEnabled, String healthCheckEndpoint) {
-        endpoints.add(new Endpoint(uri, false, healthCheckEnabled, healthCheckEndpoint));
+    public void addURI(URI uri, String instance, boolean healthCheckEnabled, String healthCheckEndpoint) {
+        endpoints.add(new Endpoint(uri, instance, false, healthCheckEnabled, healthCheckEndpoint));
     }
 
     public List<Endpoint> getEndpoints() {
@@ -25,6 +25,10 @@ public class EndpointCollection {
         return endpoint != null;
     }
 
+    public boolean containsInstance(String instance) {
+        Endpoint endpoint = findByInstance(instance);
+        return endpoint != null;
+    }
     public Endpoint findByURI(URI uri) {
         for (Endpoint endpoint : endpoints) {
             if (endpoint.getUri().equals(uri)) {
@@ -34,12 +38,20 @@ public class EndpointCollection {
         return null;
     }
 
-    public void removeURI(URI uri) {
-        Endpoint endpoint = findByURI(uri);
+    public Endpoint findByInstance(String instance) {
+        for (Endpoint endpoint : endpoints) {
+            if (endpoint.getInstance().equals(instance)) {
+                return endpoint;
+            }
+        }
+        return null;
+    }
+
+    public void removeInstance(String instance) {
+        Endpoint endpoint = findByInstance(instance);
         if (endpoint != null) {
             endpoints.remove(endpoint);
         }
-
     }
 
     public List<String> getActiveURIStrings() {
@@ -51,4 +63,5 @@ public class EndpointCollection {
         });
         return list;
     }
+
 }

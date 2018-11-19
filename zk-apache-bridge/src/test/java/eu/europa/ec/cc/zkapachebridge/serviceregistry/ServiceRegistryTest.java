@@ -14,7 +14,7 @@ public class ServiceRegistryTest {
     public void addServiceURI() {
         String url = "http://somewhere:8080/";
         ServiceRegistryImpl serviceRegistry = new ServiceRegistryImpl(mockPublisher);
-        serviceRegistry.addServiceURI("test", URI.create(url), true, "/actuator/health");
+        serviceRegistry.addServiceURI("test", "ABC", URI.create(url), true, "/actuator/health");
         EndpointCollection endpoints = serviceRegistry.getEndpointCollection("test");
         Endpoint endpoint = endpoints.findByURI(URI.create(url));
         assertNotNull(endpoint);
@@ -24,12 +24,12 @@ public class ServiceRegistryTest {
     public void removeServiceURI() {
         String url = "http://somewhere:8080/";
         ServiceRegistryImpl serviceRegistry = new ServiceRegistryImpl(mockPublisher);
-        serviceRegistry.addServiceURI("test", URI.create(url), true, "/actuator/health");
+        serviceRegistry.addServiceURI("test", "ABC", URI.create(url), true, "/actuator/health");
         EndpointCollection endpoints = serviceRegistry.getEndpointCollection("test");
         Endpoint endpoint = endpoints.findByURI(URI.create(url));
         assertNotNull(endpoint);
 
-        serviceRegistry.removeServiceURI("test", URI.create(url));
+        serviceRegistry.removeServiceURI("test", "ABC");
         endpoints = serviceRegistry.getEndpointCollection("test");
         endpoint = endpoints.findByURI(URI.create(url));
         assertNull(endpoint);

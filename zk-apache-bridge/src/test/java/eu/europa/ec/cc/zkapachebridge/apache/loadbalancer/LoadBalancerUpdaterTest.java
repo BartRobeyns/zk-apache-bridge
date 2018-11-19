@@ -89,10 +89,10 @@ public class LoadBalancerUpdaterTest {
         String serviceOneURLTwo = "http://one:2";
         String serviceTwoURLOne = "http://two:1";
         String serviceTwoURLTwo = "http://two:2";
-        serviceRegistry.addServiceURI(serviceOne, URI.create(serviceOneURLOne), true, "/actuator/health");
-        serviceRegistry.addServiceURI(serviceOne, URI.create(serviceOneURLTwo), true, "/actuator/health");
-        serviceRegistry.addServiceURI(serviceTwo, URI.create(serviceTwoURLOne), true, "/actuator/health");
-        serviceRegistry.addServiceURI(serviceTwo, URI.create(serviceTwoURLTwo), true, "/actuator/health");
+        serviceRegistry.addServiceURI(serviceOne, "ABC1", URI.create(serviceOneURLOne), true, "/actuator/health");
+        serviceRegistry.addServiceURI(serviceOne, "ABC2", URI.create(serviceOneURLTwo), true, "/actuator/health");
+        serviceRegistry.addServiceURI(serviceTwo, "ABC3", URI.create(serviceTwoURLOne), true, "/actuator/health");
+        serviceRegistry.addServiceURI(serviceTwo, "ABC4", URI.create(serviceTwoURLTwo), true, "/actuator/health");
         serviceRegistry.getServices().forEach((service,endpoints) -> {
             for (Endpoint endpoint : endpoints.getEndpoints()) {
                 endpoint.setActive(true);

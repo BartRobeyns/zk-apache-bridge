@@ -10,6 +10,8 @@ import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.apache.curator.x.discovery.details.JsonInstanceSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.zookeeper.discovery.ZookeeperInstance;
 import org.springframework.stereotype.Component;
@@ -25,6 +27,8 @@ public class ZookeeperListener implements TreeCacheListener {
     private final ServiceDiscovery serviceDiscovery;
 
     private final ServiceRegistryImpl serviceRegistry;
+
+    private final Logger LOG = LoggerFactory.getLogger(ZookeeperListener.class);
 
     @Autowired
     public ZookeeperListener(CuratorFramework curator, ServiceDiscovery serviceDiscovery, ServiceRegistryImpl serviceRegistry) {
@@ -43,13 +47,14 @@ public class ZookeeperListener implements TreeCacheListener {
 
     @Override
     public void childEvent(CuratorFramework client, TreeCacheEvent event) throws Exception {
-        System.out.println(event.getType());
+        String eventType = event.getType().name();
+        LOG.info(eventType);
         ChildData data = event.getData();
         if (null == data) {
             return;
         }
         ServicePath servicePath = getServicePath(data.getPath());
-        System.out.println(servicePath);
+        LOG.info("{} {}", eventType, servicePath.toString());
         if (servicePath.instance == null) {
             return;
         }
@@ -71,17 +76,16 @@ public class ZookeeperListener implements TreeCacheListener {
     }
 
     private void onNodeRemoved(ServicePath servicePath, ServiceInstance<ZookeeperInstance> serviceInstance) {
-        System.out.printf("Removed %s %s\n", servicePath.name, servicePath.instance);
-        String uriSpec = serviceInstance.buildUriSpec();
-        serviceRegistry.removeServiceURI(servicePath.name, URI.create(uriSpec));
+        LOG.info("Removing {} {}", servicePath.name, servicePath.instance);
+        serviceRegistry.removeServiceURI(servicePath.name, servicePath.instance);
     }
 
     private void onNodeAdded(ServicePath servicePath, ServiceInstance<ZookeeperInstance> serviceInstance) {
-        System.out.printf("Added %s %s\n", servicePath.name, servicePath.instance);
+        LOG.info("Adding {} {}", servicePath.name, servicePath.instance);
         String uriSpec = serviceInstance.buildUriSpec();
         boolean healthCheckEnabled = isHealthCheckEnabled(serviceInstance);
         String healthCheckEndpoint = uriSpec + buildHealthCheckEndpoint(serviceInstance);
-        serviceRegistry.addServiceURI(servicePath.name, URI.create(uriSpec), healthCheckEnabled, healthCheckEndpoint);
+        serviceRegistry.addServiceURI(servicePath.name, servicePath.instance, URI.create(uriSpec), healthCheckEnabled, healthCheckEndpoint);
     }
 
     private ServicePath getServicePath(String path) {

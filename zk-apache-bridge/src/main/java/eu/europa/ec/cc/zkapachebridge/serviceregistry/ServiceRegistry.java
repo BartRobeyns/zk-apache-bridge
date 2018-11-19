@@ -4,9 +4,9 @@ import java.net.URI;
 import java.util.Map;
 
 public interface ServiceRegistry {
-    void addServiceURI(String service, URI uri, boolean healthCheckEnabled, String healthCheckEndpoint);
+    void addServiceURI(String service, String instance, URI uri, boolean healthCheckEnabled, String healthCheckEndpoint);
 
-    void removeServiceURI(String service, URI uri);
+    void removeServiceURI(String service, String instance);
 
     Map<String, EndpointCollection> getServices();
 }
