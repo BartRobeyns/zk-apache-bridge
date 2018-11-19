@@ -5,6 +5,10 @@ spring:
     zookeeper:
       discovery:
         enabled: true
+        metadata:
+          healthcheck:
+            enabled: true
+            endpoint: /actuator/health
       connect-string: localhost:2181
 
 ---
@@ -13,3 +17,24 @@ spring:
   cloud:
     zookeeper:
       connect-string: zookeeper:2181
+
+---
+spring:
+  profiles: no-healthcheck
+  cloud:
+    zookeeper:
+      discovery:
+        metadata:
+          healthcheck:
+            enabled: false
+            endpoint: /never-called
+---
+spring:
+  profiles: failing-healthcheck
+  cloud:
+    zookeeper:
+      discovery:
+        metadata:
+          healthcheck:
+            enabled: true
+            endpoint: /unhealthy

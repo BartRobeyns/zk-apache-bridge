@@ -1,6 +1,7 @@
 package eu.europa.ec.cc.zkapachebridge.worker;
 
 import eu.europa.ec.cc.zkapachebridge.serviceregistry.ServiceRegistryImpl;
+import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.TreeCache;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.net.URI;
+import java.util.Map;
 
 @Component
 public class ZookeeperListener implements TreeCacheListener {
@@ -77,9 +79,10 @@ public class ZookeeperListener implements TreeCacheListener {
     private void onNodeAdded(ServicePath servicePath, ServiceInstance<ZookeeperInstance> serviceInstance) {
         System.out.printf("Added %s %s\n", servicePath.name, servicePath.instance);
         String uriSpec = serviceInstance.buildUriSpec();
-        serviceRegistry.addServiceURI(servicePath.name, URI.create(uriSpec));
+        boolean healthCheckEnabled = isHealthCheckEnabled(serviceInstance);
+        String healthCheckEndpoint = uriSpec + buildHealthCheckEndpoint(serviceInstance);
+        serviceRegistry.addServiceURI(servicePath.name, URI.create(uriSpec), healthCheckEnabled, healthCheckEndpoint);
     }
-
 
     private ServicePath getServicePath(String path) {
 
@@ -95,4 +98,24 @@ public class ZookeeperListener implements TreeCacheListener {
         }
         return instance;
     }
+
+    private String buildHealthCheckEndpoint(ServiceInstance<ZookeeperInstance> serviceInstance) {
+        return safeGetMetadata(serviceInstance, "healthcheck.endpoint", "/actuator/health");
+    }
+
+    private boolean isHealthCheckEnabled(ServiceInstance<ZookeeperInstance> serviceInstance) {
+        return "true".equals(safeGetMetadata(serviceInstance,"healthcheck.enabled", "true"));
+    }
+
+    private String safeGetMetadata(ServiceInstance<ZookeeperInstance> serviceInstance, String endpointKey, String defaultValue) {
+        if ( serviceInstance == null || serviceInstance.getPayload() == null || serviceInstance.getPayload().getMetadata() == null ) {
+            return defaultValue;
+        }
+        String value = serviceInstance.getPayload().getMetadata().get(endpointKey);
+        if ( StringUtils.isEmpty(value) ) {
+            return defaultValue;
+        }
+        return value;
+    }
+
 }

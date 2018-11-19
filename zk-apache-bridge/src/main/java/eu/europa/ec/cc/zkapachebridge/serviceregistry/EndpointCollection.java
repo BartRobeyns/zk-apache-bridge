@@ -12,8 +12,8 @@ public class EndpointCollection {
 
     private List<Endpoint> endpoints = new ArrayList<>();
 
-    public void addURI(URI uri) {
-        endpoints.add(new Endpoint(uri, false));
+    public void addURI(URI uri, boolean healthCheckEnabled, String healthCheckEndpoint) {
+        endpoints.add(new Endpoint(uri, false, healthCheckEnabled, healthCheckEndpoint));
     }
 
     public List<Endpoint> getEndpoints() {

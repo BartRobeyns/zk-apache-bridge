@@ -5,7 +5,6 @@ import eu.europa.ec.cc.zkapachebridge.serviceregistry.ServiceRegistry;
 import eu.europa.ec.cc.zkapachebridge.serviceregistry.ServiceRegistryImpl;
 import freemarker.template.Configuration;
 import org.junit.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.Assert;
 
@@ -90,10 +89,10 @@ public class LoadBalancerUpdaterTest {
         String serviceOneURLTwo = "http://one:2";
         String serviceTwoURLOne = "http://two:1";
         String serviceTwoURLTwo = "http://two:2";
-        serviceRegistry.addServiceURI(serviceOne, URI.create(serviceOneURLOne));
-        serviceRegistry.addServiceURI(serviceOne, URI.create(serviceOneURLTwo));
-        serviceRegistry.addServiceURI(serviceTwo, URI.create(serviceTwoURLOne));
-        serviceRegistry.addServiceURI(serviceTwo, URI.create(serviceTwoURLTwo));
+        serviceRegistry.addServiceURI(serviceOne, URI.create(serviceOneURLOne), true, "/actuator/health");
+        serviceRegistry.addServiceURI(serviceOne, URI.create(serviceOneURLTwo), true, "/actuator/health");
+        serviceRegistry.addServiceURI(serviceTwo, URI.create(serviceTwoURLOne), true, "/actuator/health");
+        serviceRegistry.addServiceURI(serviceTwo, URI.create(serviceTwoURLTwo), true, "/actuator/health");
         serviceRegistry.getServices().forEach((service,endpoints) -> {
             for (Endpoint endpoint : endpoints.getEndpoints()) {
                 endpoint.setActive(true);

@@ -63,50 +63,61 @@ public class HealthChecker {
         services.forEach((servicename, endpoints) -> {
             List<Endpoint> list = endpoints.getEndpoints();
             list.forEach(endpoint -> {
-                URI uri = endpoint.getUri();
-                String healthURL = uri.toString() + "/actuator/health";
-                RequestConfig requestConfig = RequestConfig.custom()
-                        .setSocketTimeout(socketTimeout)
-                        .setConnectTimeout(connectTimeout)
-                        .setConnectionRequestTimeout(connectionRequestTimeout).build();
-                try (CloseableHttpClient client
-                        = HttpClients.custom().setConnectionManager(poolingConnManager)
-                        .setConnectionManagerShared(true)
-                        .setDefaultRequestConfig(requestConfig)
-                        .build() ) {
 
-                    boolean isActive = false;
+                boolean isActive = false;
+                if ( endpoint.isHealthCheckEnabled() ) {
+                    isActive = getHealthStatus(endpoint);
+                } else {
+                    isActive = true;
+                }
 
-                    try ( CloseableHttpResponse response = client.execute(new HttpGet(healthURL)) ) {
-                        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                            String content = EntityUtils.toString(response.getEntity());
-                            try {
-                                Map<String, Object> responseMap = new GsonJsonParser().parseMap(content);
-                                if ("UP".equals(responseMap.get("status"))) {
-                                    isActive = true;
-                                }
-                            } catch( Exception e ) {
-                                LOG.error("Failed to parse content " + content);
-                            }
-                        }
-                    } catch (HttpHostConnectException e) {
-                        // host not available, mark as inactive
-                    } catch (IOException e) {
-                        LOG.error("Failed to contact " + healthURL, e);
-                    }
-
-                    if (endpoint.isActive() != isActive) {
-                        endpoint.setActive(enabled?isActive:true);
-                        LOG.info("endpoint changed: " + endpoint);
-                        eventPublisher.publishEvent(new ServiceRegistryUpdatedEvent(this));
-                    }
-                } catch (IOException e) {
-                    LOG.error("Failed to contact " + healthURL, e);
+                if (endpoint.isActive() != isActive) {
+                    endpoint.setActive(enabled?isActive:true);
+                    LOG.info("endpoint changed: " + endpoint);
+                    eventPublisher.publishEvent(new ServiceRegistryUpdatedEvent(this));
                 }
 
             });
 
         });
 
+    }
+
+    private boolean getHealthStatus(Endpoint endpoint) {
+        boolean isActive = false;
+        String healthURL = endpoint.getHealthCheckEndpoint();
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setSocketTimeout(socketTimeout)
+                .setConnectTimeout(connectTimeout)
+                .setConnectionRequestTimeout(connectionRequestTimeout).build();
+        try (CloseableHttpClient client
+                     = HttpClients.custom().setConnectionManager(poolingConnManager)
+                .setConnectionManagerShared(true)
+                .setDefaultRequestConfig(requestConfig)
+                .build()) {
+
+
+            try (CloseableHttpResponse response = client.execute(new HttpGet(healthURL))) {
+                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                    String content = EntityUtils.toString(response.getEntity());
+                    try {
+                        Map<String, Object> responseMap = new GsonJsonParser().parseMap(content);
+                        if ("UP".equals(responseMap.get("status"))) {
+                            isActive = true;
+                        }
+                    } catch (Exception e) {
+                        LOG.error("Failed to parse content " + content);
+                    }
+                }
+            } catch (HttpHostConnectException e) {
+                // host not available, mark as inactive
+            } catch (IOException e) {
+                LOG.error("Failed to contact " + healthURL, e);
+            }
+
+        } catch (IOException e) {
+            LOG.error("Failed to contact " + healthURL, e);
+        }
+        return isActive;
     }
 }

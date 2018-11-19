@@ -34,6 +34,30 @@ services:
           - zookeeper
         depends_on:
           - zookeeper
+        environment:
+          SPRING_PROFILES_ACTIVE: docker
+
+    zkclientsample_no_healthcheck:
+      image: ecdevops.eu/zkclientsample
+      ports:
+      - 8080
+      links:
+      - zookeeper
+      depends_on:
+      - zookeeper
+      environment:
+        SPRING_PROFILES_ACTIVE: docker,no_healthcheck
+
+    zkclientsample_unhealth:
+      image: ecdevops.eu/zkclientsample
+      ports:
+      - 8080
+      links:
+      - zookeeper
+      depends_on:
+      - zookeeper
+      environment:
+        SPRING_PROFILES_ACTIVE: docker,failing-healthcheck
 
     zkapachebridge-rewritemap:
       image: ecdevops.eu/zk-apache-bridge-docker-rewritemap

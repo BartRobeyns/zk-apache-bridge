@@ -26,10 +26,10 @@ curl http://localhost/zk-sample-client/zkclient
 
 docker-compose up -d --scale zkclientsample=3
 # give it some time, then repeat the following to see different  ip-addresses in the response
-curl http://localhost/zk-sample-client/zkclient
+curl http://localhost/zk-client-sample/zkclient
 
 # The RewriteRule-based loadbalancing listens on port 80, to see the LoadBalancer-configuration in action use port 8080 instead:
-curl http://localhost:8080/services/zk-sample-client/zkclient
+curl http://localhost:8080/services/zk-client-sample/zkclient
 ```
 
 ## Run it with an existing Apache
