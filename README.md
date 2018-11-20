@@ -68,6 +68,13 @@ GET http://<host>:<port>/api/info/loadbalancer
 GET http://<host>:<port>/api/info/rewritemap
 ```
 
+## Configure your application
+You can enable or disable healtchecks on your application, and set an alternative health-check endpoint
+```
+spring.cloud.zookeeper.discovery.metadata.healthcheck.enabled=<true|false> (default:true)
+spring.cloud.zookeeper.discovery.metadata.healthcheck.endpoint=<endpoint where zk-apache-bridge should check for service health> (default:/actuator/health)
+```
+
 ### RewriteRule-based loadbalancing
 [See the RewriteMap Docker-image](./zk-apache-bridge-docker/zk-apache-bridge-docker-rewritemap)
 
